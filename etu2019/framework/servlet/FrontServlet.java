@@ -11,14 +11,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.*;
-  
+   import java.util.HashMap;
+import etu2019.framework.Mapping;
 
 /**
  *
  * @author koloina
  */
 public class FrontServlet extends HttpServlet {
-
+     HashMap<String,Mapping> MappingUrls;
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
