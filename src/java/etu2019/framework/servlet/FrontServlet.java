@@ -10,106 +10,23 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import javax.servlet.*;
+   import java.util.HashMap;
+import etu2019.framework.Mapping;
 
 /**
  *
  * @author koloina
  */
 public class FrontServlet extends HttpServlet {
-    
+     HashMap<String,Mapping> MappingUrls;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try ( PrintWriter out = response.getWriter()) {
              String query = request.getQueryString(); 
              String urlString = request.getRequestURL().toString() + "?" + query; 
-             out.println("URL: " + urlString);
-             
-            
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
+             out.println("URL: " + urlString);       
              
         }
     }
