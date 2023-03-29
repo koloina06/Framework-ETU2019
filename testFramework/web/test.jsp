@@ -1,6 +1,6 @@
 <%-- 
-    Document   : index
-    Created on : 3 mars 2023, 10:02:43
+    Document   : test
+    Created on : 24 mars 2023, 10:21:18
     Author     : koloina
 --%>
 
@@ -12,8 +12,6 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <form action="dept-all" method="get">
-            <input type="submit" value="Valider">
-        </form>
+        <h1>Hello World!</h1>
     </body>
 </html>
