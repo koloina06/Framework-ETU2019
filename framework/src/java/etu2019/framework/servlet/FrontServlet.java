@@ -74,12 +74,15 @@ public class FrontServlet extends HttpServlet {
                  ModelView mv= (ModelView) m.invoke(o);
                  if(mv.getClass() == ModelView.class){
                      RequestDispatcher dispat = request.getRequestDispatcher(mv.getView());
+                     HashMap<String,Object> data= mv.getData();
+                    for(HashMap.Entry<String,Object> d : data.entrySet()){
+                      request.setAttribute(d.getKey(),d.getValue());
+                    }
                      dispat.forward(request,response);
-                     
                  }
              }
         }catch(Exception e){
-            //e.printStackTrace(out);
+            e.printStackTrace(out);
         }
     }
 

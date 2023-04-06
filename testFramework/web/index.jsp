@@ -12,7 +12,7 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <form action="dept-all" method="get">
+        <form action="emp-all" method="get">
             <input type="submit" value="Valider">
         </form>
     </body>
