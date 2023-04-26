@@ -18,19 +18,19 @@ public class Emp {
     String nom;
     int age;
 
-    public String getNom() {
+    public String getnom() {
         return nom;
     }
 
-    public void setNom(String nom) {
+    public void setnom(String nom) {
         this.nom = nom;
     }
 
-    public int getAge() {
+    public int getage() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setage(int age) {
         this.age = age;
     }
 
@@ -55,4 +55,10 @@ public class Emp {
         mv.addItem("listEmp", list);
         return mv;
     }
+   
+    @App(url="save-emp")
+   public void save(){
+       System.out.println("nom: "+ nom);
+       System.out.println("age: "+ age);
+   }
 }

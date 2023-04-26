@@ -17,8 +17,12 @@ import etu2019.framework.Mapping;
 import etu2019.framework.ModelView;
 import etu2019.framework.annotation.App;
 import etu2019.framework.annotation.ControllerA;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -54,6 +58,34 @@ public class FrontServlet extends HttpServlet {
             
         }
     
+    public void setAttribute(HttpServletRequest request,String[] attribute, Field[] att,Object o){
+        try{
+            for(int i=0; i<att.length; i++){
+                for(int j=0; j<attribute.length; j++){
+                    if(att[i].getName().equalsIgnoreCase(attribute[j])){
+                        if(att[i].getType()==String.class) 
+                        {
+                            Method m1= o.getClass().getMethod("set" + att[i].getName(), String.class);
+                            m1.invoke(o, request.getParameter(att[i].getName()));
+                        }
+                        if(att[i].getType()==int.class) 
+                        {
+                            Method m1= o.getClass().getMethod("set" + att[i].getName(), int.class );
+                            m1.invoke(o, Integer.parseInt(request.getParameter(att[i].getName())));
+                        }
+                        if(att[i].getType()==double.class) 
+                        {
+                            Method m1= o.getClass().getMethod("set" + att[i].getName(), double.class );
+                            m1.invoke(o, Double.parseDouble(request.getParameter(att[i].getName())));
+                        }
+                    }
+                }                           
+            }
+        }catch(Exception e){
+        
+        }
+       
+    }
      
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -62,25 +94,38 @@ public class FrontServlet extends HttpServlet {
         try  {  
              String query = request.getQueryString();
              String urlString = request.getRequestURL().toString(); 
-             //out.print(urlString);
+            
              String [] tab= urlString.split("/");
              String url= tab[tab.length-1];
-             if(this.mappingUrls.containsKey(url)){
+              if(this.mappingUrls.containsKey(url)){
                  String className= this.mappingUrls.get(url).getclassName();
                  String method= this.mappingUrls.get(url).getmethod();
                  Class<?> c= Class.forName(className);
                  Method m= c.getDeclaredMethod(method);
                  Object o= c.newInstance();
-                 ModelView mv= (ModelView) m.invoke(o);
-                 if(mv.getClass() == ModelView.class){
-                     RequestDispatcher dispat = request.getRequestDispatcher(mv.getView());
-                     HashMap<String,Object> data= mv.getData();
-                    for(HashMap.Entry<String,Object> d : data.entrySet()){
-                      request.setAttribute(d.getKey(),d.getValue());
+                      if(request.getParameterMap()!=null){
+                        Map<String, String[]> parameter= request.getParameterMap();
+                        Set<String> parameterName= parameter.keySet();
+                        String[] attribute= parameterName.toArray(new String[parameterName.size()]);
+                        Field[] att= o.getClass().getDeclaredFields();
+                        this.setAttribute(request,attribute,att,o);
+                      }
+                      
+                 Object object=  m.invoke(o);
+                    if(object != null){
+                        if(object.getClass() == ModelView.class)
+                      {
+                            ModelView mv= (ModelView) object;
+                            RequestDispatcher dispat = request.getRequestDispatcher(mv.getView());
+                            HashMap<String,Object> data= mv.getData();
+                            for(HashMap.Entry<String,Object> d : data.entrySet()){
+                                request.setAttribute(d.getKey(),d.getValue());
+                            }
+                            dispat.forward(request,response);
+                      }
                     }
-                     dispat.forward(request,response);
-                 }
-             }
+                      
+              }
         }catch(Exception e){
             e.printStackTrace(out);
         }

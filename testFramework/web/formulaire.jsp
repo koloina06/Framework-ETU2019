@@ -1,6 +1,6 @@
 <%-- 
-    Document   : index
-    Created on : 3 mars 2023, 10:02:43
+    Document   : formulaire
+    Created on : 25 avr. 2023, 11:23:02
     Author     : koloina
 --%>
 
@@ -12,9 +12,10 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <form action="emp-all" method="get">
-            <input type="submit" value="Valider">
+        <form action="save-emp" method="get">
+            <p>Nom: <input type="text" name="nom"></p>
+            <p>Age: <input type="text" name="age"></p>
+            <input type="submit" value="valider">
         </form>
-        <a href="formulaire.jsp">Formulaire</a>
     </body>
 </html>
