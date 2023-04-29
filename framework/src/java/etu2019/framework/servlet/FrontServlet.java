@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.*;
-   import java.util.HashMap;
+import java.util.HashMap;
 import etu2019.framework.Mapping;
 import etu2019.framework.ModelView;
 import etu2019.framework.annotation.App;
@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,21 +64,11 @@ public class FrontServlet extends HttpServlet {
             for(int i=0; i<att.length; i++){
                 for(int j=0; j<attribute.length; j++){
                     if(att[i].getName().equalsIgnoreCase(attribute[j])){
-                        if(att[i].getType()==String.class) 
-                        {
-                            Method m1= o.getClass().getMethod("set" + att[i].getName(), String.class);
-                            m1.invoke(o, request.getParameter(att[i].getName()));
-                        }
-                        if(att[i].getType()==int.class) 
-                        {
-                            Method m1= o.getClass().getMethod("set" + att[i].getName(), int.class );
-                            m1.invoke(o, Integer.parseInt(request.getParameter(att[i].getName())));
-                        }
-                        if(att[i].getType()==double.class) 
-                        {
-                            Method m1= o.getClass().getMethod("set" + att[i].getName(), double.class );
-                            m1.invoke(o, Double.parseDouble(request.getParameter(att[i].getName())));
-                        }
+                        Method m1= o.getClass().getMethod("set" + att[i].getName(), att[i].getType());
+                        if(att[i].getType()==String.class) m1.invoke(o, request.getParameter(att[i].getName()));
+                        if(att[i].getType()==int.class)  m1.invoke(o, Integer.parseInt(request.getParameter(att[i].getName())));
+                        if(att[i].getType()==double.class)  m1.invoke(o, Double.parseDouble(request.getParameter(att[i].getName())));
+                        if(att[i].getType()==Date.class)  m1.invoke(o, Date.valueOf(request.getParameter(att[i].getName())));
                     }
                 }                           
             }
