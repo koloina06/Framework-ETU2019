@@ -15,6 +15,7 @@
         <form action="save-emp" method="get">
             <p>Nom: <input type="text" name="nom"></p>
             <p>Age: <input type="text" name="age"></p>
+            <p>Date: <input type="date" name="date"></p>
             <input type="submit" value="valider">
         </form>
     </body>

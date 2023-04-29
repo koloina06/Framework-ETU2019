@@ -7,6 +7,7 @@ import etu2019.framework.ModelView;
 import etu2019.framework.annotation.App;
 import etu2019.framework.annotation.ControllerA;
 import java.util.ArrayList;
+import java.sql.Date;
 
 
 /**
@@ -15,9 +16,19 @@ import java.util.ArrayList;
  */
 @ControllerA
 public class Emp {
+    int idEmp;
     String nom;
     int age;
+    Date date;
 
+    public void setidEmp(int idEmp) {
+        this.idEmp = idEmp;
+    }
+
+    public int getidEmp() {
+        return idEmp;
+    }
+    
     public String getnom() {
         return nom;
     }
@@ -33,10 +44,19 @@ public class Emp {
     public void setage(int age) {
         this.age = age;
     }
+    
+    public void setdate(Date date) {
+        this.date = date;
+    }
+
+    public Date getdate() {
+        return date;
+    }
+
 
     public Emp(String nom, int age) {
-        this.nom = nom;
-        this.age = age;
+        setnom(nom);
+        setage(age);
     }
     
     public Emp(){
@@ -60,5 +80,12 @@ public class Emp {
    public void save(){
        System.out.println("nom: "+ nom);
        System.out.println("age: "+ age);
+       System.out.println("date: "+ date);
+   }
+   
+   @App(url="fiche-emp")
+   public ModelView fiche(Integer id){
+       ModelView mv= new ModelView();
+       return mv;
    }
 }
