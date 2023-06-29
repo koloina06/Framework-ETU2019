@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.io.IOException;
+import java.lang.reflect.Parameter;
 import java.sql.Date;
 import java.util.Map;
 import java.util.Set;
@@ -77,6 +78,15 @@ public class FrontServlet extends HttpServlet {
         }
        
     }
+    
+     public Object cast(HttpServletRequest request, Parameter parametre, Object o) {
+        try {
+            Method method = o.getClass().getMethod("get" + parametre.getName());
+            return method.invoke(o);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
      
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -92,17 +102,44 @@ public class FrontServlet extends HttpServlet {
                  String className= this.mappingUrls.get(url).getclassName();
                  String method= this.mappingUrls.get(url).getmethod();
                  Class<?> c= Class.forName(className);
-                 Method m= c.getDeclaredMethod(method);
+                 Method[] methods = c.getDeclaredMethods();
+                 Method m = null;
+                for (Method methode : methods) {
+                    if(methode.getName() == method){
+                        m = methode;
+                    }
+                }
                  Object o= c.newInstance();
+                  Object[] arguments = null;
                       if(request.getParameterMap()!=null){
                         Map<String, String[]> parameter= request.getParameterMap();
                         Set<String> parameterName= parameter.keySet();
                         String[] attribute= parameterName.toArray(new String[parameterName.size()]);
                         Field[] att= o.getClass().getDeclaredFields();
                         this.setAttribute(request,attribute,att,o);
-                      }
-                      
-                 Object object=  m.invoke(o);
+                        Class<?>[] parameterTypes = m.getParameterTypes();
+                        if(parameterTypes.length != 0){
+                        arguments = new Object[parameterTypes.length];
+                        Parameter[] parameters = m.getParameters();
+                        int arg = 0;
+                        for (Parameter parametre : parameters) {
+                            String parametreName = parametre.getName();
+                            for (int k = 0; k<attribute.length; k++){
+                                if(attribute[k].equals(parametreName)){
+                                    arguments[arg] = cast(request, parametre, o);
+                                    arg++;
+                                    
+                                }
+                            }
+                        }
+                        for (Object argument : arguments){
+                            out.print(argument.getClass());
+                        }
+                    }
+                         
+                 }
+                
+                 Object object=  m.invoke(o,arguments);
                     if(object != null){
                         if(object.getClass() == ModelView.class)
                       {

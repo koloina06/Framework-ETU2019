@@ -4,12 +4,14 @@
  */
 package etu2019.framework.annotation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
+/**
+ *
+ * @author koloina
+ */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface App {
-    String url();
+public @interface Scope {
+    String valeur();
 }
