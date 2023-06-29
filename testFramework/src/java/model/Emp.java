@@ -54,7 +54,8 @@ public class Emp {
     }
 
 
-    public Emp(String nom, int age) {
+    public Emp(int idEmp,String nom, int age) {
+        setidEmp(idEmp);
         setnom(nom);
         setage(age);
     }
@@ -65,8 +66,8 @@ public class Emp {
         
      @App(url="emp-all")
    public ModelView  findAll(){
-       Emp e1= new Emp("Rabe",30);
-       Emp e2= new Emp("Rasoa",25);
+       Emp e1= new Emp(1,"Rabe",30);
+       Emp e2= new Emp(2,"Rasoa",25);
        ArrayList<Emp> list= new ArrayList<Emp>();
        list.add(e1);
        list.add(e2);
@@ -84,8 +85,10 @@ public class Emp {
    }
    
    @App(url="fiche-emp")
-   public ModelView fiche(Integer id){
+   public ModelView fiche(String nom){
        ModelView mv= new ModelView();
+       mv.setView("fiche.jsp");
+       mv.addItem("fiche", nom);
        return mv;
    }
 }
