@@ -13,7 +13,11 @@
     </head>
     <body>
         <form action="emp-all" method="get">
-            <input type="submit" value="Valider">
+            <input type="submit" value="Voir la liste des employés">
+        </form>
+        <form action="upload-emp" method="post" enctype="multipart/form-data">
+            <input type="file" name="fichier">
+            <input type="submit" value="Upload">
         </form>
         <a href="formulaire.jsp">Formulaire</a>
     </body>

@@ -4,6 +4,7 @@
  */
 package model;
 import etu2019.framework.ModelView;
+import etu2019.framework.FileUpload;
 import etu2019.framework.annotation.App;
 import etu2019.framework.annotation.ControllerA;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class Emp {
     String nom;
     int age;
     Date date;
+    FileUpload fichier;
 
     public void setidEmp(int idEmp) {
         this.idEmp = idEmp;
@@ -52,6 +54,14 @@ public class Emp {
     public Date getdate() {
         return date;
     }
+    
+    public void setfichier(FileUpload file){
+        this.fichier= file;
+    }
+    
+    public FileUpload getfichier(){
+        return fichier;
+    }
 
 
     public Emp(int idEmp,String nom, int age) {
@@ -64,20 +74,20 @@ public class Emp {
     
     }
         
-     @App(url="emp-all")
+   @App(url="emp-all")
    public ModelView  findAll(){
        Emp e1= new Emp(1,"Rabe",30);
        Emp e2= new Emp(2,"Rasoa",25);
        ArrayList<Emp> list= new ArrayList<Emp>();
        list.add(e1);
        list.add(e2);
-        ModelView mv= new ModelView();
-        mv.setView("test.jsp");
-        mv.addItem("listEmp", list);
-        return mv;
+       ModelView mv= new ModelView();
+       mv.setView("test.jsp");
+       mv.addItem("listEmp", list);
+       return mv;
     }
    
-    @App(url="save-emp")
+   @App(url="save-emp")
    public void save(){
        System.out.println("nom: "+ nom);
        System.out.println("age: "+ age);
@@ -91,4 +101,13 @@ public class Emp {
        mv.addItem("fiche", nom);
        return mv;
    }
+   
+   @App(url="upload-emp")
+   public ModelView upload(){
+       ModelView mv= new ModelView();
+       mv.setView("file.jsp");
+       mv.addItem("fichier", fichier.getname());
+       return mv;
+   }
+
 }
