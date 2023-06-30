@@ -17,19 +17,27 @@ import etu2019.framework.Mapping;
 import etu2019.framework.ModelView;
 import etu2019.framework.annotation.App;
 import etu2019.framework.annotation.ControllerA;
+import etu2019.framework.FileUpload;
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Parameter;
 import java.sql.Date;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.Part;
 
 /**
  *
  * @author koloina
  */
+
+@MultipartConfig
 public class FrontServlet extends HttpServlet {
      HashMap<String,Mapping> mappingUrls= new HashMap<String, Mapping>();
 
@@ -40,25 +48,24 @@ public class FrontServlet extends HttpServlet {
             String p= context.getInitParameter("package");
             try{
                  List<Class<?>> annoted_classes =  Annote.getClassesWithAnnotation2(ControllerA.class,p);
-             for (Class<?> c : annoted_classes) {
-                
-            Method[] methods = c.getMethods();
-            for (Method m : methods) {
-                 if (m.isAnnotationPresent(App.class)) {
-                    Mapping mapping = new Mapping();
-                    mapping.setclassName(c.getName());
-                    mapping.setmethod(m.getName());
-                    App app = m.getAnnotation(App.class);
-                    String url = app.url();
-                    this.mappingUrls.put(url,mapping);
+                for (Class<?> c : annoted_classes) {     
+                    Method[] methods = c.getMethods();
+                    for (Method m : methods) {
+                         if (m.isAnnotationPresent(App.class)) {
+                            Mapping mapping = new Mapping();
+                            mapping.setclassName(c.getName());
+                            mapping.setmethod(m.getName());
+                            App app = m.getAnnotation(App.class);
+                            String url = app.url();
+                            this.mappingUrls.put(url,mapping);
+                        }
+                    }
                 }
-            }
-            }
             }catch(Exception e){
             
             }
             
-        }
+    }
     
     public void setAttribute(HttpServletRequest request,String[] attribute, Field[] att,Object o){
         try{
@@ -75,8 +82,7 @@ public class FrontServlet extends HttpServlet {
             }
         }catch(Exception e){
         
-        }
-       
+        } 
     }
     
      public Object cast(HttpServletRequest request, Parameter parametre, Object o) {
@@ -88,6 +94,46 @@ public class FrontServlet extends HttpServlet {
         }
     }
      
+     private FileUpload fileTraitement( Collection<Part> files, Field field){
+        FileUpload file = new FileUpload();
+        String name = field.getName();
+        boolean exists = false;
+        String filename = null;
+        Part filepart = null;
+        for( Part part : files ){
+            if( part.getName().equals(name) ){
+                filepart = part;
+                exists = true;
+                break;
+            }
+        }
+        try(InputStream io = filepart.getInputStream()){
+            ByteArrayOutputStream buffers = new ByteArrayOutputStream();
+            byte[] buffer = new byte[(int)filepart.getSize()];
+            int read;
+            while( ( read = io.read( buffer , 0 , buffer.length )) != -1 ){
+                buffers.write( buffer , 0, read );
+            }
+            file.setname( this.getFileName(filepart) );
+            file.setbytes( buffers.toByteArray() );
+            return file;
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String getFileName(Part part) {
+        String contentDisposition = part.getHeader("content-disposition");
+        String[] parts = contentDisposition.split(";");
+        for (String partStr : parts) {
+            if (partStr.trim().startsWith("filename"))
+                return partStr.substring(partStr.indexOf('=') + 1).trim().replace("\"", "");
+        }
+        return null;
+    }
+
+     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -98,7 +144,7 @@ public class FrontServlet extends HttpServlet {
             
              String [] tab= urlString.split("/");
              String url= tab[tab.length-1];
-              if(this.mappingUrls.containsKey(url)){
+             if(this.mappingUrls.containsKey(url)){
                  String className= this.mappingUrls.get(url).getclassName();
                  String method= this.mappingUrls.get(url).getmethod();
                  Class<?> c= Class.forName(className);
@@ -110,34 +156,48 @@ public class FrontServlet extends HttpServlet {
                     }
                 }
                  Object o= c.newInstance();
-                  Object[] arguments = null;
+                 Object[] arguments = null;
+                 
                       if(request.getParameterMap()!=null){
                         Map<String, String[]> parameter= request.getParameterMap();
                         Set<String> parameterName= parameter.keySet();
                         String[] attribute= parameterName.toArray(new String[parameterName.size()]);
                         Field[] att= o.getClass().getDeclaredFields();
+                        for(Field field : att){
+                            try{
+                                if(field.getType() == FileUpload.class) {
+                                    Method methody= o.getClass().getMethod("set" + field.getName(), field.getType());
+                                    Collection<Part> files = request.getParts();
+                                    FileUpload file = this.fileTraitement(files, field);
+                                    methody.invoke(o,file);
+                                }
+                            } catch(Exception e){
+                                out.println(e.getMessage());
+                            }
+                    }
                         this.setAttribute(request,attribute,att,o);
                         Class<?>[] parameterTypes = m.getParameterTypes();
+                        
                         if(parameterTypes.length != 0){
-                        arguments = new Object[parameterTypes.length];
-                        Parameter[] parameters = m.getParameters();
-                        int arg = 0;
-                        for (Parameter parametre : parameters) {
-                            String parametreName = parametre.getName();
-                            for (int k = 0; k<attribute.length; k++){
-                                if(attribute[k].equals(parametreName)){
-                                    arguments[arg] = cast(request, parametre, o);
-                                    arg++;
-                                    
+                            arguments = new Object[parameterTypes.length];
+                            Parameter[] parameters = m.getParameters();
+                            int arg = 0;
+                            for (Parameter parametre : parameters) {
+                                String parametreName = parametre.getName();
+                                for (int k = 0; k<attribute.length; k++){
+                                    if(attribute[k].equals(parametreName)){
+                                        arguments[arg] = cast(request, parametre, o);
+                                        arg++;
+
+                                    }
                                 }
                             }
+                            for (Object argument : arguments){
+                                out.print(argument.getClass());
+                            }
                         }
-                        for (Object argument : arguments){
-                            out.print(argument.getClass());
-                        }
-                    }
                          
-                 }
+                    }
                 
                  Object object=  m.invoke(o,arguments);
                     if(object != null){
