@@ -18,6 +18,7 @@ import etu2019.framework.ModelView;
 import etu2019.framework.annotation.App;
 import etu2019.framework.annotation.ControllerA;
 import etu2019.framework.FileUpload;
+import etu2019.framework.annotation.Scope;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -40,7 +41,7 @@ import javax.servlet.http.Part;
 @MultipartConfig
 public class FrontServlet extends HttpServlet {
      HashMap<String,Mapping> mappingUrls= new HashMap<String, Mapping>();
-
+     HashMap<Class,Object> singleton= new HashMap<Class,Object>();
      
         @Override
     public void init() throws ServletException{
@@ -48,7 +49,14 @@ public class FrontServlet extends HttpServlet {
             String p= context.getInitParameter("package");
             try{
                  List<Class<?>> annoted_classes =  Annote.getClassesWithAnnotation2(ControllerA.class,p);
-                for (Class<?> c : annoted_classes) {     
+                 for (Class<?> c : annoted_classes) { 
+                    if(c.isAnnotationPresent(Scope.class)){
+                        Scope scope= c.getAnnotation(Scope.class);
+                        if(scope.valeur().equals("singleton")){
+                           Object obj= c.newInstance();
+                           this.singleton.put(c,obj);
+                        }
+                    }
                     Method[] methods = c.getMethods();
                     for (Method m : methods) {
                          if (m.isAnnotationPresent(App.class)) {
@@ -61,6 +69,7 @@ public class FrontServlet extends HttpServlet {
                         }
                     }
                 }
+                 
             }catch(Exception e){
             
             }
@@ -83,6 +92,20 @@ public class FrontServlet extends HttpServlet {
         }catch(Exception e){
         
         } 
+    }
+    
+    public void reset(HttpServletRequest request, Field[] att, Object o){
+        try{
+            for(int i=0; i<att.length; i++){
+                Method m= o.getClass().getMethod("set" + att[i].getName(), att[i].getType());
+                if(att[i].getType()==String.class) m.invoke(o, null);
+                if(att[i].getType()==int.class || att[i].getType()==double.class)  m.invoke(o,0);
+                if(att[i].getType()==Date.class)  m.invoke(o, null);
+                if(att[i].getType()==Boolean.class)  m.invoke(o, "false");
+            }
+        }catch(Exception e){
+        
+        }
     }
     
      public Object cast(HttpServletRequest request, Parameter parametre, Object o) {
@@ -155,7 +178,18 @@ public class FrontServlet extends HttpServlet {
                         m = methode;
                     }
                 }
-                 Object o= c.newInstance();
+                Object o= null;
+                
+                if(this.singleton.containsKey(c)){
+                    Field[] att= c.getDeclaredFields();
+                    o = this.singleton.get(c);
+                    this.reset(request, att, o);
+                    out.print("singleton");
+                }else{
+                    o= c.newInstance();
+                    out.print("tsy singleton");
+                }
+                 
                  Object[] arguments = null;
                  
                       if(request.getParameterMap()!=null){

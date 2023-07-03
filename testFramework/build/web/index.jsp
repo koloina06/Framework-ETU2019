@@ -19,6 +19,11 @@
             <input type="file" name="fichier">
             <input type="submit" value="Upload">
         </form>
+        <form action="test-dept" method="get">
+            <p>Departement: <input type="text" name="nom" ></p>
+            <p>Nombre employés: <input type="text" name="nombreEmp" ></p>
+            <input type="submit" value="Departement">
+        </form>
         <a href="formulaire.jsp">Formulaire</a>
     </body>
 </html>
