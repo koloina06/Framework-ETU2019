@@ -7,6 +7,7 @@ import etu2019.framework.ModelView;
 import etu2019.framework.FileUpload;
 import etu2019.framework.annotation.App;
 import etu2019.framework.annotation.ControllerA;
+import etu2019.framework.annotation.Scope;
 import java.util.ArrayList;
 import java.sql.Date;
 
@@ -14,14 +15,17 @@ import java.sql.Date;
 /**
  *
  * @author koloina
- */
+*/
+
 @ControllerA
+@Scope(valeur="")
 public class Emp {
     int idEmp;
     String nom;
     int age;
     Date date;
     FileUpload fichier;
+    int appel = 1;
 
     public void setidEmp(int idEmp) {
         this.idEmp = idEmp;
@@ -62,12 +66,21 @@ public class Emp {
     public FileUpload getfichier(){
         return fichier;
     }
+    
+    public void setappel(int appel){
+        this.appel=appel;
+    }
+    
+    public int getappel(){
+        return appel;
+    }
 
 
     public Emp(int idEmp,String nom, int age) {
         setidEmp(idEmp);
         setnom(nom);
         setage(age);
+        this.appel += 1;
     }
     
     public Emp(){

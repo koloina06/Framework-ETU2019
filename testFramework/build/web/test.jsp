@@ -17,7 +17,7 @@
     <body>
         <h4>Liste des employes</h4>
         <% for(int i=0; i<list.size(); i++){ %>
-            <p><a href="fiche-emp?nom=<% out.print(list.get(i).getnom()); %>"> <% out.print(list.get(i).getnom()); %> </a></p>
+            <p><a href="fiche-emp?nom=<% out.print(list.get(i).getnom()); %>"> <% out.print(list.get(i).getnom()); %> <% out.print(list.get(i).getappel()); %></a></p>
         <% } %>      
     </body>
 </html>
