@@ -6,6 +6,7 @@ package model;
 import etu2019.framework.ModelView;
 import etu2019.framework.FileUpload;
 import etu2019.framework.annotation.App;
+import etu2019.framework.annotation.Auth;
 import etu2019.framework.annotation.ControllerA;
 import etu2019.framework.annotation.Scope;
 import java.util.ArrayList;
@@ -86,7 +87,8 @@ public class Emp {
     public Emp(){
     
     }
-        
+   
+   @Auth(profil="admin")
    @App(url="emp-all")
    public ModelView  findAll(){
        Emp e1= new Emp(1,"Rabe",30);
@@ -99,6 +101,7 @@ public class Emp {
        mv.addItem("listEmp", list);
        return mv;
     }
+   
    
    @App(url="save-emp")
    public void save(){
@@ -122,5 +125,14 @@ public class Emp {
        mv.addItem("fichier", fichier.getname());
        return mv;
    }
+   
+  /* @App(url="json-emp")
+   public ModelView getJson(){
+       Emp emp= new Emp(1,"Rabe",30);
+       ModelView mv= new ModelView();
+       mv.addItem("test", emp);
+       mv.setIsJson(true);
+       return mv;
+   }*/
 
 }

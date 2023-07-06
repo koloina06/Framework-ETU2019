@@ -9,6 +9,7 @@ import etu2019.framework.ModelView;
 import etu2019.framework.annotation.App;
 import etu2019.framework.annotation.ControllerA;
 import etu2019.framework.annotation.Scope;
+import etu2019.framework.annotation.RestAPI;
 
 /**
  *
@@ -65,4 +66,13 @@ public class Dept {
        mv.addItem("test", this);
        return mv;
     }
+    
+   /* @App(url="list-dept")
+    @RestAPI
+    public Dept[] liste(){
+        Dept[] list= new Dept[2];
+        list[0]= new Dept("info",5);
+        list[1]= new Dept("compta",8);
+        return list;
+    }*/
 }
