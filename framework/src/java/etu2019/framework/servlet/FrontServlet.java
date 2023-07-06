@@ -4,6 +4,7 @@
  */
 package etu2019.framework.servlet;
 
+import com.google.gson.Gson;
 import etu2019.framework.Annote;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,6 +19,8 @@ import etu2019.framework.ModelView;
 import etu2019.framework.annotation.App;
 import etu2019.framework.annotation.ControllerA;
 import etu2019.framework.FileUpload;
+import etu2019.framework.annotation.Auth;
+import etu2019.framework.annotation.RestAPI;
 import etu2019.framework.annotation.Scope;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
@@ -42,11 +45,19 @@ import javax.servlet.http.Part;
 public class FrontServlet extends HttpServlet {
      HashMap<String,Mapping> mappingUrls= new HashMap<String, Mapping>();
      HashMap<Class,Object> singleton= new HashMap<Class,Object>();
+     //Gson gson = new Gson();
+     boolean containsFile= false;
+     String sessionName;
+     String sessionProfil;
      
-        @Override
+    @Override
     public void init() throws ServletException{
             ServletContext context= getServletContext();
             String p= context.getInitParameter("package");
+            sessionName = context.getInitParameter("sessionName");
+            System.out.println("sessionName init "+ sessionName);
+            sessionProfil = context.getInitParameter("sessionProfil");
+            System.out.println("sessionProfil init "+ sessionProfil);
             try{
                  List<Class<?>> annoted_classes =  Annote.getClassesWithAnnotation2(ControllerA.class,p);
                  for (Class<?> c : annoted_classes) { 
@@ -180,14 +191,27 @@ public class FrontServlet extends HttpServlet {
                 }
                 Object o= null;
                 
+                if (m.isAnnotationPresent(Auth.class)) {
+                    Auth a = (Auth) m.getAnnotation(Auth.class);
+                    if (request.getSession().getAttribute(sessionName) != null) {
+                        System.out.println(request.getSession().getAttribute(sessionName));
+                        if ((a.profil().isEmpty() == false
+                                && !a.profil().equals(request.getSession().getAttribute(sessionProfil)))) {
+                            throw new Exception("privilege non accordé");
+                        }
+                    } else {
+                        throw new Exception("pas de session");
+                    }
+                }
+                
                 if(this.singleton.containsKey(c)){
                     Field[] att= c.getDeclaredFields();
                     o = this.singleton.get(c);
                     this.reset(request, att, o);
-                    out.print("singleton");
+                    //out.print("singleton");
                 }else{
                     o= c.newInstance();
-                    out.print("tsy singleton");
+                    //out.print("tsy singleton");
                 }
                  
                  Object[] arguments = null;
@@ -197,13 +221,19 @@ public class FrontServlet extends HttpServlet {
                         Set<String> parameterName= parameter.keySet();
                         String[] attribute= parameterName.toArray(new String[parameterName.size()]);
                         Field[] att= o.getClass().getDeclaredFields();
+                        String contentType = request.getHeader("Content-Type");
                         for(Field field : att){
                             try{
                                 if(field.getType() == FileUpload.class) {
-                                    Method methody= o.getClass().getMethod("set" + field.getName(), field.getType());
-                                    Collection<Part> files = request.getParts();
-                                    FileUpload file = this.fileTraitement(files, field);
-                                    methody.invoke(o,file);
+                                    if (contentType != null && contentType.startsWith("multipart/form-data")) {
+                                        containsFile= true;
+                                    } 
+                                    if (containsFile == true) {
+                                        Method methody= o.getClass().getMethod("set" + field.getName(), field.getType());
+                                        Collection<Part> files = request.getParts();
+                                        FileUpload file = this.fileTraitement(files, field);
+                                        methody.invoke(o,file);
+                                    }
                                 }
                             } catch(Exception e){
                                 out.println(e.getMessage());
@@ -234,16 +264,30 @@ public class FrontServlet extends HttpServlet {
                     }
                 
                  Object object=  m.invoke(o,arguments);
+                 /*if(m.isAnnotationPresent(RestAPI.class)){
+                      out.println( gson.toJson(object) );
+                 }*/
                     if(object != null){
                         if(object.getClass() == ModelView.class)
                       {
                             ModelView mv= (ModelView) object;
-                            RequestDispatcher dispat = request.getRequestDispatcher(mv.getView());
                             HashMap<String,Object> data= mv.getData();
-                            for(HashMap.Entry<String,Object> d : data.entrySet()){
-                                request.setAttribute(d.getKey(),d.getValue());
+                            HashMap<String, Object> session = mv.getsession();
+                            for (Map.Entry<String, Object> sess : session.entrySet()) {
+                                 request.getSession().setAttribute(sess.getKey(), sess.getValue());
                             }
-                            dispat.forward(request,response);
+                            //if(mv.getIsJson()==true){
+                                 //out.println( gson.toJson(data) );
+                            //}else{
+                                if(data != null){
+                                    for(HashMap.Entry<String,Object> d : data.entrySet()){
+                                        request.setAttribute(d.getKey(),d.getValue());
+                                    }
+                                }
+                                //out.print(mv.getIsJson());
+                                RequestDispatcher dispat = request.getRequestDispatcher(mv.getView());
+                                dispat.forward(request,response);
+                            //} 
                       }
                     }
                       
