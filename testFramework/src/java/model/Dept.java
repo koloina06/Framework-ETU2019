@@ -67,12 +67,12 @@ public class Dept {
        return mv;
     }
     
-   /* @App(url="list-dept")
+    @App(url="list-dept")
     @RestAPI
     public Dept[] liste(){
         Dept[] list= new Dept[2];
         list[0]= new Dept("info",5);
         list[1]= new Dept("compta",8);
         return list;
-    }*/
+    }
 }

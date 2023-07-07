@@ -287,9 +287,9 @@ public class FrontServlet extends HttpServlet {
                 }
                   
                  Object object=  m.invoke(o,arguments);
-                 /*if(m.isAnnotationPresent(RestAPI.class)){
+                 if(m.isAnnotationPresent(RestAPI.class)){
                       out.println( gson.toJson(object) );
-                 }*/
+                 }
                     if(object != null){
                         if(object.getClass() == ModelView.class)
                       {

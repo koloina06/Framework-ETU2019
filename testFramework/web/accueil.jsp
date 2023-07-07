@@ -27,7 +27,9 @@
         <form action="json-emp" method="get">
             <input type="submit" value="Json">
         </form>
-        
+        <form action="list-dept" method="get">
+            <input type="submit" value="Liste des departements">
+        </form>
         <a href="formulaire.jsp">Formulaire</a>
     </body>
 </html>
