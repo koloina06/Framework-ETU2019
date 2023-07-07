@@ -71,6 +71,6 @@
 
 3)Dans les jsp:
 
-   -les nom des parametres doivent etre semblables au nom des attributs de la classe
+       -les nom des parametres doivent etre semblables au nom des attributs de la classe
 
 4)Ajouter la librairie gson.jar
