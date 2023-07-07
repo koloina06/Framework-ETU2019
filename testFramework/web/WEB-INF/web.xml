@@ -12,6 +12,10 @@
         <param-name>sessionProfil</param-name>
         <param-value>profil</param-value>
     </context-param>
+    <context-param>
+        <param-name>sessionAttribute</param-name>
+        <param-value>id</param-value>
+    </context-param>
     <servlet>
         <servlet-name>FrontServlet</servlet-name>
         <servlet-class>etu2019.framework.servlet.FrontServlet</servlet-class>

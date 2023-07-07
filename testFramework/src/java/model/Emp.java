@@ -9,8 +9,10 @@ import etu2019.framework.annotation.App;
 import etu2019.framework.annotation.Auth;
 import etu2019.framework.annotation.ControllerA;
 import etu2019.framework.annotation.Scope;
+import etu2019.framework.annotation.Session;
 import java.util.ArrayList;
 import java.sql.Date;
+import java.util.HashMap;
 
 
 /**
@@ -27,6 +29,7 @@ public class Emp {
     Date date;
     FileUpload fichier;
     int appel = 1;
+    HashMap<String, Object> session = new HashMap<String, Object>();
 
     public void setidEmp(int idEmp) {
         this.idEmp = idEmp;
@@ -76,6 +79,14 @@ public class Emp {
         return appel;
     }
 
+    public HashMap<String, Object> getsession() {
+        return session;
+    }
+
+    public void setsession(HashMap<String, Object> sessions) {
+        this.session = sessions;
+    }
+
 
     public Emp(int idEmp,String nom, int age) {
         setidEmp(idEmp);
@@ -83,6 +94,7 @@ public class Emp {
         setage(age);
         this.appel += 1;
     }
+   
     
     public Emp(){
     
@@ -102,12 +114,13 @@ public class Emp {
        return mv;
     }
    
-   
+   @Session(session="")
    @App(url="save-emp")
-   public void save(){
-       System.out.println("nom: "+ nom);
-       System.out.println("age: "+ age);
-       System.out.println("date: "+ date);
+   public ModelView save(){
+       ModelView mv= new ModelView();
+       mv.setView("save.jsp");
+       mv.addItem("emp" , this);
+       return mv;
    }
    
    @App(url="fiche-emp")

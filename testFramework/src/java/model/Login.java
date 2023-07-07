@@ -51,9 +51,11 @@ public class Login {
         if(this.getusername().equals("koloina") && this.getpassword().equals("mihajatiana")){
              mv.addSession("isConnected", true);
              mv.addSession("profil", "admin");
+             mv.addSession("id", 1);
         }else{
             mv.addSession("isConnected", true);
-             mv.addSession("profil", "user");
+            mv.addSession("profil", "user");
+            mv.addSession("id", 2);
         }
         mv.setView("accueil.jsp");
         return mv;
