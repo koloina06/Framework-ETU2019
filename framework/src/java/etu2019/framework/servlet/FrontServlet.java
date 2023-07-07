@@ -22,6 +22,7 @@ import etu2019.framework.FileUpload;
 import etu2019.framework.annotation.Auth;
 import etu2019.framework.annotation.RestAPI;
 import etu2019.framework.annotation.Scope;
+import etu2019.framework.annotation.Session;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -30,7 +31,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Parameter;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.annotation.MultipartConfig;
@@ -49,6 +52,7 @@ public class FrontServlet extends HttpServlet {
      boolean containsFile= false;
      String sessionName;
      String sessionProfil;
+     String sessionAttribute;
      
     @Override
     public void init() throws ServletException{
@@ -58,6 +62,7 @@ public class FrontServlet extends HttpServlet {
             System.out.println("sessionName init "+ sessionName);
             sessionProfil = context.getInitParameter("sessionProfil");
             System.out.println("sessionProfil init "+ sessionProfil);
+            sessionAttribute = context.getInitParameter("sessionAttribute");
             try{
                  List<Class<?>> annoted_classes =  Annote.getClassesWithAnnotation2(ControllerA.class,p);
                  for (Class<?> c : annoted_classes) { 
@@ -213,6 +218,8 @@ public class FrontServlet extends HttpServlet {
                     o= c.newInstance();
                     //out.print("tsy singleton");
                 }
+                
+                
                  
                  Object[] arguments = null;
                  
@@ -263,6 +270,22 @@ public class FrontServlet extends HttpServlet {
                          
                     }
                 
+                  if(m.isAnnotationPresent(Session.class)){
+                     ArrayList<String> sessions = Collections.list(request.getSession().getAttributeNames());
+                     HashMap<String, Object> session = new HashMap<String, Object>();
+                     for (String attribute : sessions) {
+                        Object value = request.getSession().getAttribute(attribute);
+                        session.put( attribute , value );
+                     }           
+                    try{
+                         Method sess = c.getDeclaredMethod("setsession",HashMap.class);
+                         sess.invoke(o, session); 
+                    }catch(Exception e){
+
+                    }
+                   
+                }
+                  
                  Object object=  m.invoke(o,arguments);
                  /*if(m.isAnnotationPresent(RestAPI.class)){
                       out.println( gson.toJson(object) );
