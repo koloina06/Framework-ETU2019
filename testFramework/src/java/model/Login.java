@@ -4,6 +4,7 @@
  */
 package model;
 
+
 import etu2019.framework.ModelView;
 import etu2019.framework.annotation.App;
 import etu2019.framework.annotation.ControllerA;
@@ -59,5 +60,13 @@ public class Login {
         }
         mv.setView("accueil.jsp");
         return mv;
+   }
+   
+   @App(url="logout")
+   public ModelView logout(){
+       ModelView mv = new ModelView();
+       mv.setView("index.jsp");
+       mv.setInvalidateSession(true);
+       return mv;
    }
 }

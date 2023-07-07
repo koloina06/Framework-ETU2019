@@ -180,7 +180,6 @@ public class FrontServlet extends HttpServlet {
         try  {  
              String query = request.getQueryString();
              String urlString = request.getRequestURL().toString(); 
-            
              String [] tab= urlString.split("/");
              String url= tab[tab.length-1];
              if(this.mappingUrls.containsKey(url)){
@@ -196,6 +195,7 @@ public class FrontServlet extends HttpServlet {
                 }
                 Object o= null;
                 
+                //Authentification
                 if (m.isAnnotationPresent(Auth.class)) {
                     Auth a = (Auth) m.getAnnotation(Auth.class);
                     if (request.getSession().getAttribute(sessionName) != null) {
@@ -209,6 +209,7 @@ public class FrontServlet extends HttpServlet {
                     }
                 }
                 
+                //Singleton
                 if(this.singleton.containsKey(c)){
                     Field[] att= c.getDeclaredFields();
                     o = this.singleton.get(c);
@@ -218,16 +219,17 @@ public class FrontServlet extends HttpServlet {
                     o= c.newInstance();
                     //out.print("tsy singleton");
                 }
-                
-                
                  
                  Object[] arguments = null;
                  
+                      //Parametre de la requete
                       if(request.getParameterMap()!=null){
                         Map<String, String[]> parameter= request.getParameterMap();
                         Set<String> parameterName= parameter.keySet();
                         String[] attribute= parameterName.toArray(new String[parameterName.size()]);
                         Field[] att= o.getClass().getDeclaredFields();
+                        
+                        //FileUpload
                         String contentType = request.getHeader("Content-Type");
                         for(Field field : att){
                             try{
@@ -235,6 +237,7 @@ public class FrontServlet extends HttpServlet {
                                     if (contentType != null && contentType.startsWith("multipart/form-data")) {
                                         containsFile= true;
                                     } 
+                                    //set attribut file de la classe
                                     if (containsFile == true) {
                                         Method methody= o.getClass().getMethod("set" + field.getName(), field.getType());
                                         Collection<Part> files = request.getParts();
@@ -245,8 +248,12 @@ public class FrontServlet extends HttpServlet {
                             } catch(Exception e){
                                 out.println(e.getMessage());
                             }
-                    }
+                        }
+                        
+                        // set attribut
                         this.setAttribute(request,attribute,att,o);
+                        
+                        //Parametre d'une methode
                         Class<?>[] parameterTypes = m.getParameterTypes();
                         
                         if(parameterTypes.length != 0){
@@ -270,6 +277,7 @@ public class FrontServlet extends HttpServlet {
                          
                     }
                 
+                   //Set session dans l'attribut de la classe
                   if(m.isAnnotationPresent(Session.class)){
                      ArrayList<String> sessions = Collections.list(request.getSession().getAttributeNames());
                      HashMap<String, Object> session = new HashMap<String, Object>();
@@ -287,18 +295,37 @@ public class FrontServlet extends HttpServlet {
                 }
                   
                  Object object=  m.invoke(o,arguments);
+                 
+                 //Rest API JSON
                  if(m.isAnnotationPresent(RestAPI.class)){
                       out.println( gson.toJson(object) );
                  }
                     if(object != null){
+                        
+                        //Retourne un modelview
                         if(object.getClass() == ModelView.class)
                       {
                             ModelView mv= (ModelView) object;
                             HashMap<String,Object> data= mv.getData();
+                            
+                            //session du modelview et ajout de ces valeurs dans request.getSession
                             HashMap<String, Object> session = mv.getsession();
                             for (Map.Entry<String, Object> sess : session.entrySet()) {
                                  request.getSession().setAttribute(sess.getKey(), sess.getValue());
                             }
+                            
+                            //effacer tous les sessions
+                            if( mv.isInvalidateSession() == true){
+                                request.getSession().invalidate();
+                            }
+                            
+                            //effacer les sessions contenues dans la liste
+                            List<String> sessions = mv.getRemoveSession();
+                            for(String string : sessions){
+                                request.getSession().removeAttribute(string);
+                            }
+                            
+                            //Json
                             if(mv.getIsJson()==true){
                                  out.println( gson.toJson(data) );
                             }else{
@@ -307,7 +334,6 @@ public class FrontServlet extends HttpServlet {
                                         request.setAttribute(d.getKey(),d.getValue());
                                     }
                                 }
-                                out.print(mv.getIsJson());
                                 RequestDispatcher dispat = request.getRequestDispatcher(mv.getView());
                                 dispat.forward(request,response);
                             } 

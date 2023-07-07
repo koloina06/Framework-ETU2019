@@ -147,5 +147,13 @@ public class Emp {
        mv.setIsJson(true);
        return mv;
    }
+   
+   @App(url="delete")
+   public ModelView deleteSession(){
+        ModelView mv= new ModelView();
+        mv.setView("accueil.jsp");
+        mv.getRemoveSession().add("id");
+        return mv;
+   }
 
 }

@@ -4,7 +4,9 @@
  */
 package etu2019.framework;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -15,6 +17,8 @@ public class ModelView {
     HashMap<String,Object> data;
     boolean isJson = false;
     HashMap<String, Object> session = new HashMap<>();
+    boolean invalidateSession = false;
+    List<String> removeSession = new ArrayList<String>();
 
     public String getView() {
         return view;
@@ -58,5 +62,22 @@ public class ModelView {
     public void addSession(String key,Object object) {
         this.session.put(key,object);
     }
+
+    public boolean isInvalidateSession() {
+        return invalidateSession;
+    }
+
+    public void setInvalidateSession(boolean invalidateSession) {
+        this.invalidateSession = invalidateSession;
+    }
+
+    public List<String> getRemoveSession() {
+        return removeSession;
+    }
+
+    public void setRemoveSession(List<String> removeSession) {
+        this.removeSession = removeSession;
+    }
+    
     
 }
