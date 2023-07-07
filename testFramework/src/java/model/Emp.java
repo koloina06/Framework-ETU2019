@@ -139,13 +139,13 @@ public class Emp {
        return mv;
    }
    
-  /* @App(url="json-emp")
+   @App(url="json-emp")
    public ModelView getJson(){
        Emp emp= new Emp(1,"Rabe",30);
        ModelView mv= new ModelView();
        mv.addItem("test", emp);
        mv.setIsJson(true);
        return mv;
-   }*/
+   }
 
 }

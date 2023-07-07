@@ -12,10 +12,13 @@ cd temp
 mkdir WEB-INF
 mkdir WEB-INF/classes
 mkdir WEB-INF/lib
+cd ../jar_files
+cp gson-2.8.2.jar $testFramework/web/WEB-INF/lib/
 cd ../Framework/build/web/WEB-INF/classes
 jar -cfv framework.jar *
 cp framework.jar $testFramework/web/WEB-INF/lib/
 cp framework.jar $projetFramework/temp/WEB-INF/lib/
+cp $testFramework/web/WEB-INF/lib/gson-2.8.2.jar $projetFramework/temp/WEB-INF/lib/
 rm  framework.jar
 cd $projetFramework
 cp $testFrameworkWeb/*.jsp temp
@@ -25,5 +28,6 @@ cd temp
 jar -cfv testFrame.war *
 cp testFrame.war $testFrameWar
 rm -r ../temp
+
 
 

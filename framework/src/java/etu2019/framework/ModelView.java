@@ -13,7 +13,7 @@ import java.util.HashMap;
 public class ModelView {
     String view;
     HashMap<String,Object> data;
-    //boolean isJson = false;
+    boolean isJson = false;
     HashMap<String, Object> session = new HashMap<>();
 
     public String getView() {
@@ -32,13 +32,13 @@ public class ModelView {
         this.data = data;
     }
 
-    /*public boolean getIsJson() {
+    public boolean getIsJson() {
         return isJson;
     }
 
     public void setIsJson(boolean isJson) {
         this.isJson = isJson;
-    }*/
+    }
     
     
     

@@ -48,7 +48,7 @@ import javax.servlet.http.Part;
 public class FrontServlet extends HttpServlet {
      HashMap<String,Mapping> mappingUrls= new HashMap<String, Mapping>();
      HashMap<Class,Object> singleton= new HashMap<Class,Object>();
-     //Gson gson = new Gson();
+     Gson gson = new Gson();
      boolean containsFile= false;
      String sessionName;
      String sessionProfil;
@@ -299,18 +299,18 @@ public class FrontServlet extends HttpServlet {
                             for (Map.Entry<String, Object> sess : session.entrySet()) {
                                  request.getSession().setAttribute(sess.getKey(), sess.getValue());
                             }
-                            //if(mv.getIsJson()==true){
-                                 //out.println( gson.toJson(data) );
-                            //}else{
+                            if(mv.getIsJson()==true){
+                                 out.println( gson.toJson(data) );
+                            }else{
                                 if(data != null){
                                     for(HashMap.Entry<String,Object> d : data.entrySet()){
                                         request.setAttribute(d.getKey(),d.getValue());
                                     }
                                 }
-                                //out.print(mv.getIsJson());
+                                out.print(mv.getIsJson());
                                 RequestDispatcher dispat = request.getRequestDispatcher(mv.getView());
                                 dispat.forward(request,response);
-                            //} 
+                            } 
                       }
                     }
                       

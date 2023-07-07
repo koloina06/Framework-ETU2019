@@ -24,7 +24,10 @@
             <p>Nombre employés: <input type="text" name="nombreEmp" ></p>
             <input type="submit" value="Departement">
         </form>
-       
+        <form action="json-emp" method="get">
+            <input type="submit" value="Json">
+        </form>
+        
         <a href="formulaire.jsp">Formulaire</a>
     </body>
 </html>
